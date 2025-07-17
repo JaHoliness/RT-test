@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Implicit Reaction Time Test</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Helvetica', sans-serif;
+      background-color: #A6A6A6;
+      color: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .floating-window {
+      background-color: #E7E6E2;
+      border-radius: 24px;
+      padding: 30px;
+      width: 90vw;
+      height: 90vh;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    button {
+      transition: transform 0.1s ease;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .begin-button, .response-button {
+      background-color: #FE7B3F;
+      border: none;
+      color: #fff;
+      padding: 16px 32px;
+      font-size: 18px;
+      border-radius: 12px;
+      margin-top: 30px;
+      cursor: pointer;
+    }
+
+    .response-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 40px;
+      margin-top: 40px;
+    }
+
+    .response-button {
+      width: auto;
+      min-width: 100px;
+    }
+
+    .response-left {
+      align-self: flex-start;
+    }
+
+    .response-right {
+      align-self: flex-end;
+    }
+
+    .thumb-zone {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      max-width: 500px;
+      margin-top: 30px;
+    }
+
+    .thumb-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #FE7B3F;
+      border: none;
+      cursor: pointer;
+    }
+
+    .statement-box {
+      background-color: #fff;
+      border: 2px solid #A6A6A6;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .stimulus {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-window">
+    <div class="screen active" id="instruction-screen">
+      <h2>We are now going to try something a little bit different</h2>
+      <p>You are about to see a series of statements. For each one, please indicate whether or not you think it applies to the range of products you see. Please respond as quickly and accurately as you can by pressing either "Yes" or "No".</p>
+      <button class="begin-button" onclick="showCalibration()">Begin</button>
+    </div>
+
+    <div class="screen" id="calibration-screen">
+      <h3>Please place your thumbs on both buttons when ready</h3>
+      <div class="thumb-zone">
+        <button class="thumb-button" id="left-thumb" ontouchstart="thumbDown('left')" ontouchend="thumbUp('left')"></button>
+        <button class="thumb-button" id="right-thumb" ontouchstart="thumbDown('right')" ontouchend="thumbUp('right')"></button>
+      </div>
+    </div>
+
+    <div class="screen" id="statement-screen">
+      <div class="statement-box" id="statement-text"></div>
+      <div class="stimulus" id="stimulus">
+        <img src="https://eu-images.contentstack.com/v3/assets/blt6618a6af19da7ce1/blt02f55d3a2868efc7/6711966f659bff9586f052b6/pele_snowman_(2)_(1).png" alt="Stimulus" style="max-width: 100%; height: auto; border-radius: 8px;">
+      </div>
+      <div class="response-row">
+        <button class="response-button response-left" onclick="handleResponse('No')">No</button>
+        <button class="response-button response-right" onclick="handleResponse('Yes')">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const statements = [
+      "Is modern",
+      "Looks new and different",
+      "Is effective on tough stains",
+      "Is effective in a quick wash cycle"
+    ];
+
+    let currentIndex = 0;
+    let thumbs = { left: false, right: false };
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showCalibration() {
+      showScreen('calibration-screen');
+    }
+
+    function thumbDown(side) {
+      thumbs[side] = true;
+      if (thumbs.left && thumbs.right) {
+        setTimeout(() => {
+          thumbs.left = false;
+          thumbs.right = false;
+          showStatement();
+        }, 300);
+      }
+    }
+
+    function thumbUp(side) {
+      thumbs[side] = false;
+    }
+
+    function showStatement() {
+      if (currentIndex >= statements.length) {
+        alert('Test complete!');
+        return;
+      }
+      document.getElementById('statement-text').innerText = statements[currentIndex];
+      showScreen('statement-screen');
+    }
+
+    function handleResponse(answer) {
+      console.log(`Statement: ${statements[currentIndex]}, Answer: ${answer}`);
+      currentIndex++;
+      setTimeout(() => {
+        showCalibration();
+      }, 300);
+    }
+  </script>
+</body>
+</html>
